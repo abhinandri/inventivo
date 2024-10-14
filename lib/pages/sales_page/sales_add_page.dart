@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:project/db_function/product_function.dart';
 import 'package:project/db_function/catagory_function.dart';
 import 'package:project/db_function/sales_function.dart';
@@ -35,7 +36,8 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
     super.initState();
     _fetchProducts();
     _fetchCategories();
-    _dateController.text = DateTime.now().toString().split(' ')[0];
+    // _dateController.text = DateTime.now().toString().split(' ')[0];
+     _dateController.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
   }
 
   @override
@@ -66,108 +68,103 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
     }
   }
 
-  void _showProductSelectionBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.75,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Select Product',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              const SizedBox(height: 16),
-              _buildCategoryDropdown(),
-              const SizedBox(height: 16),
-              _buildSearchField(),
-              const SizedBox(height: 16),
-              Expanded(
-                child: _buildProductList(),
-              ),
-            ],
-          ),
-        );
-      },
-    ).then((selectedProduct) {
-      if (selectedProduct != null) {
-        setState(() {
-          _selectedProduct = selectedProduct;
-          _quantityController.text = '1'; // Default quantity
-          _priceController.text =
-              selectedProduct.price.toStringAsFixed(2); // Default price
-        });
-      }
-    });
-  }
 
-  Widget _buildCategoryDropdown() {
-    return DropdownButtonFormField<String>(
-      value: _selectedCategory,
-      decoration: InputDecoration(
-        labelText: 'Select Category',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+void _showProductSelectionBottomSheet() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Select Product',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            const SizedBox(height: 16),
+            _buildSearchField(),
+            const SizedBox(height: 16),
+            Expanded(
+              child: _buildProductList(),
+            ),
+          ],
         ),
+      );
+    },
+  ).then((selectedProduct) {
+    if (selectedProduct != null) {
+      setState(() {
+        _selectedProduct = selectedProduct;
+        _quantityController.text = '1'; // Default quantity
+        _priceController.text =
+            selectedProduct.price.toStringAsFixed(2); // Default price
+      });
+    }
+  });
+}
+
+Widget _buildSearchField() {
+  return TextField(
+    decoration: InputDecoration(
+      labelText: 'Search Products',
+      prefixIcon: const Icon(Icons.search),
+      suffixIcon: IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          setState(() {
+            _searchQuery = ''; // Clear the search query
+          });
+        },
       ),
-      items: _categories.map((category) {
-        return DropdownMenuItem(
-          value: category.id,
-          child: Text(category.name),
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedCategory = value;
-        });
-      },
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+    onChanged: (value) {
+      // You can implement a debounce function here if needed
+      setState(() {
+        _searchQuery = value;
+      });
+    },
+  );
+}
+
+Widget _buildProductList() {
+  List<ProductModel> filteredProducts = _products.where((product) {
+    return product.name.toLowerCase().contains(_searchQuery.toLowerCase());
+  }).toList();
+
+  // If no products are found, show a message
+  if (filteredProducts.isEmpty) {
+    return Center(
+      child: Text(
+        'No products found',
+        style: TextStyle(color: Colors.grey),
+      ),
     );
   }
 
-  Widget _buildSearchField() {
-    return TextField(
-      decoration: InputDecoration(
-        labelText: 'Search Products',
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      onChanged: (value) {
-        setState(() {
-          _searchQuery = value;
-        });
-      },
-    );
-  }
-
-  Widget _buildProductList() {
-    List<ProductModel> filteredProducts = _products.where((product) {
-      bool categoryMatch =
-          _selectedCategory == null || product.categoryId == _selectedCategory;
-      bool searchMatch =
-          product.name.toLowerCase().contains(_searchQuery.toLowerCase());
-      return categoryMatch && searchMatch;
-    }).toList();
-
-    return ListView.builder(
-      itemCount: filteredProducts.length,
-      itemBuilder: (context, index) {
-        final product = filteredProducts[index];
-        return ListTile(
+  return ListView.builder(
+    itemCount: filteredProducts.length,
+    itemBuilder: (context, index) {
+      final product = filteredProducts[index];
+      return Card( // Added Card for better styling
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: ListTile(
           title: Text(product.name),
-          subtitle: Text('Price: \$${product.price.toStringAsFixed(2)}'),
+          subtitle: Text('Price: \₹${product.price.toStringAsFixed(2)}'),
           onTap: () {
             Navigator.of(context).pop(product);
           },
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 
   Future<void> _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
@@ -178,7 +175,8 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
     );
     if (pickedDate != null) {
       setState(() {
-        _dateController.text = pickedDate.toLocal().toString().split(' ')[0];
+        // _dateController.text = pickedDate.toLocal().toString().split(' ')[0];
+          _dateController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
       });
     }
   }
@@ -536,7 +534,9 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Sale',),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: CustomeColors.Primary,
+        title: const Text('Add Sale',style: TextStyle(color: Colors.white),),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -555,7 +555,7 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                 _selectDate,
               ),
               _buildTextFormField(
-                  _customernameController, 'Customer Name', Icons.person),
+                  _customernameController, 'Customer Name', Icons.person,),
               _buildTextFormField(_customernumberController, 'Mobile Number',
                   Icons.phone, TextInputType.number),
                   SizedBox(height: 40,),

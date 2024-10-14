@@ -62,6 +62,7 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:project/model_classes/sales_model.dart';
+import 'package:project/pages/color.dart';
 
 class SaleDetailsPage extends StatefulWidget {
   final SalesModel sale;
@@ -77,7 +78,9 @@ class _SaleDetailsPageState extends State<SaleDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sale Details'),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: CustomeColors.Primary,
+        title: const Text('Sale Details',style: TextStyle(color: Colors.white),),
         centerTitle: true,
         elevation: 0,
       ),

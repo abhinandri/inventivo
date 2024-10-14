@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:project/db_function/sales_function.dart';
+import 'package:project/db_function/revenue_function.dart';
 import 'package:project/pages/color.dart';
 
 class RevenuePage extends StatefulWidget {
@@ -38,45 +38,46 @@ class _RevenuePageState extends State<RevenuePage> {
     }
   }
 
-  Future<Map<String, dynamic>> getRevenueData({DateTime? from, DateTime? to}) async {
-    final sales = await getAllSales();
 
-    final startDate = from ?? DateTime(2000); // Default start date if none selected
-    final endDate = to ?? DateTime.now(); // Default end date if none selected
+  // Future<Map<String, dynamic>> getRevenueData({DateTime? from, DateTime? to}) async {
+  //   final sales = await getAllSales();
 
-    double totalRevenue = 0.0;
-    double todaysRevenue = 0.0;
-    int totalSales = 0;
-    List<double> weeklyRevenue = List.filled(7, 0.0); // For weekly revenue tracking
+  //   final startDate = from ?? DateTime(2000); // Default start date if none selected
+  //   final endDate = to ?? DateTime.now(); // Default end date if none selected
 
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  //   double totalRevenue = 0.0;
+  //   double todaysRevenue = 0.0;
+  //   int totalSales = 0;
+  //   List<double> weeklyRevenue = List.filled(7, 0.0); // For weekly revenue tracking
 
-    for (var sale in sales) {
-      final saleDate = DateTime.parse(sale.date); // Ensure sale.date is in correct format
+  //   final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
-      // Check if the saleDate is within the selected range
-      if (saleDate.isAfter(startDate.subtract(Duration(days: 1))) && saleDate.isBefore(endDate.add(Duration(days: 1)))) {
-        totalRevenue += sale.totalAmount ?? 0.0;
-        totalSales++;
+  //   for (var sale in sales) {
+  //     final saleDate = DateTime.parse(sale.date); // Ensure sale.date is in correct format
 
-        // Check if the sale was made today
-        if (sale.date == today) {
-          todaysRevenue += sale.totalAmount ?? 0.0;
-        }
+  //     // Check if the saleDate is within the selected range
+  //     if (saleDate.isAfter(startDate.subtract(Duration(days: 1))) && saleDate.isBefore(endDate.add(Duration(days: 1)))) {
+  //       totalRevenue += sale.totalAmount ?? 0.0;
+  //       totalSales++;
 
-        // Get the weekday index (0 for Monday, 6 for Sunday)
-        final dayOfWeek = (saleDate.weekday - 1) % 7; 
-        weeklyRevenue[dayOfWeek] += sale.totalAmount ?? 0.0; // Aggregate revenue for the week
-      }
-    }
+  //       // Check if the sale was made today
+  //       if (sale.date == today) {
+  //         todaysRevenue += sale.totalAmount ?? 0.0;
+  //       }
 
-    return {
-      'todaysRevenue': todaysRevenue,
-      'totalRevenue': totalRevenue,
-      'totalSales': totalSales,
-      'weeklyRevenue': weeklyRevenue,
-    };
-  }
+  //       // Get the weekday index (0 for Monday, 6 for Sunday)
+  //       final dayOfWeek = (saleDate.weekday - 1) % 7; 
+  //       weeklyRevenue[dayOfWeek] += sale.totalAmount ?? 0.0; // Aggregate revenue for the week
+  //     }
+  //   }
+
+  //   return {
+  //     'todaysRevenue': todaysRevenue,
+  //     'totalRevenue': totalRevenue,
+  //     'totalSales': totalSales,
+  //     'weeklyRevenue': weeklyRevenue,
+  //   };
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +123,7 @@ class _RevenuePageState extends State<RevenuePage> {
                   Text(
                     selectedDateRange == null
                         ? 'No date range selected'
-                        : 'Selected Range: ${DateFormat('MMM d').format(selectedDateRange!.start)} - ${DateFormat('MMM d').format(selectedDateRange!.end)}',
+                        : 'Selected Range: ${DateFormat('MMM d').format(selectedDateRange!.start)} - ${DateFormat('dd-MM-yyyy').format(selectedDateRange!.end)}',
                     style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 16),
@@ -182,76 +183,156 @@ class _RevenuePageState extends State<RevenuePage> {
     );
   }
 
-  Widget _buildRevenueChart(List<double> weeklyRevenue) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Weekly Revenue',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 200,
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                          return Text(days[value.toInt() % 7]);
-                        },
-                      ),
+Widget _buildRevenueChart(List<double> weeklyRevenue) {
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Weekly Revenue',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 200,
+            width: 400,
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        return Text(days[value.toInt() % 7]);
+                      },
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          return Text('₹${value.toInt()}');
-                        },
-                      ),
-                    ),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
-                  borderData: FlBorderData(show: true),
-                  minX: 0,
-                  maxX: 6,
-                  minY: 0,
-                  maxY: weeklyRevenue.reduce((a, b) => a > b ? a : b),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: weeklyRevenue
-                          .asMap()
-                          .entries
-                          .map((e) => FlSpot(e.key.toDouble(), e.value))
-                          .toList(),
-                      isCurved: true,
-                      color: CustomeColors.Primary,
-                      barWidth: 3,
-                      isStrokeCapRound: true,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: CustomeColors.Primary.withOpacity(0.2),
-                      ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        // Format numbers with 'k' for thousands and 'm' for millions
+                        if (value >= 1000000) {
+                          return Text('₹${(value / 1000000).toStringAsFixed(1)}m');
+                        } else if (value >= 1000) {
+                          return Text('₹${(value / 1000).toStringAsFixed(1)}k');
+                        }
+                        return Text('₹${value.toInt()}');
+                      },
                     ),
-                  ],
+                  ),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
+                borderData: FlBorderData(show: true),
+                minX: 0,
+                maxX: 6,
+                minY: 0,
+                maxY: weeklyRevenue.reduce((a, b) => a > b ? a : b),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: weeklyRevenue
+                        .asMap()
+                        .entries
+                        .map((e) => FlSpot(e.key.toDouble(), e.value))
+                        .toList(),
+                    isCurved: true,
+                    color: CustomeColors.Primary,
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: CustomeColors.Primary.withOpacity(0.2),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+  // Widget _buildRevenueChart(List<double> weeklyRevenue) {
+  //   return Card(
+  //     elevation: 4,
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           const Text(
+  //             'Weekly Revenue',
+  //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //           ),
+  //           const SizedBox(height: 16),
+  //           SizedBox(
+  //             height: 200,
+  //             child: LineChart(
+  //               LineChartData(
+  //                 gridData: FlGridData(show: false),
+  //                 titlesData: FlTitlesData(
+  //                   bottomTitles: AxisTitles(
+  //                     sideTitles: SideTitles(
+  //                       showTitles: true,
+  //                       getTitlesWidget: (value, meta) {
+  //                         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  //                         return Text(days[value.toInt() % 7]);
+  //                       },
+  //                     ),
+  //                   ),
+  //                   leftTitles: AxisTitles(
+  //                     sideTitles: SideTitles(
+  //                       showTitles: true,
+  //                       reservedSize: 40,
+  //                       getTitlesWidget: (value, meta) {
+  //                         return Text('₹${value.toInt()}');
+  //                       },
+  //                     ),
+  //                   ),
+  //                   topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  //                   rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  //                 ),
+  //                 borderData: FlBorderData(show: true),
+  //                 minX: 0,
+  //                 maxX: 6,
+  //                 minY: 0,
+  //                 maxY: weeklyRevenue.reduce((a, b) => a > b ? a : b),
+  //                 lineBarsData: [
+  //                   LineChartBarData(
+  //                     spots: weeklyRevenue
+  //                         .asMap()
+  //                         .entries
+  //                         .map((e) => FlSpot(e.key.toDouble(), e.value))
+  //                         .toList(),
+  //                     isCurved: true,
+  //                     color: CustomeColors.Primary,
+  //                     barWidth: 3,
+  //                     isStrokeCapRound: true,
+  //                     dotData: FlDotData(show: false),
+  //                     belowBarData: BarAreaData(
+  //                       show: true,
+  //                       color: CustomeColors.Primary.withOpacity(0.2),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

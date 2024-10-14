@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project/db_function/product_function.dart';
 import 'package:project/model_classes/productModel.dart';
+import 'package:project/pages/color.dart';
 
 class EditProductPage extends StatefulWidget {
   final ProductModel product;
@@ -83,7 +84,9 @@ class _EditProductPageState extends State<EditProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Product'),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: CustomeColors.Primary,
+        title: const Text('Edit Product',style: TextStyle(color: Colors.white),),
         centerTitle: true,
         actions: [
           IconButton(

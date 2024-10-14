@@ -146,7 +146,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   
                   onPressed: _addProduct,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4DD0E1  ),
+                    backgroundColor: CustomeColors.Primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

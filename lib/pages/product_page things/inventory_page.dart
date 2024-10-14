@@ -234,7 +234,10 @@ class _InventoryState extends State<Inventory> {
   }
 
   Widget _buildProductsList() {
-    if (products.isEmpty) {
+    return ValueListenableBuilder<List<ProductModel>>(
+      valueListenable: productListNotifier,
+      builder: (context, products, child) {
+         if (products.isEmpty) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -266,77 +269,111 @@ class _InventoryState extends State<Inventory> {
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            // physics: const NeverScrollableScrollPhysics(
-            // parent: NeverScrollableScrollPhysics()
-            // ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 2,
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  leading: product.imagePath != null &&
-                          File(product.imagePath!).existsSync()
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            File(product.imagePath!),
+          child: Container(
+            child: ListView.builder(
+              // physics: const NeverScrollableScrollPhysics(
+              // parent: NeverScrollableScrollPhysics()
+              // ),
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  elevation: 2,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(8),
+                    leading: product.imagePath != null &&
+                            File(product.imagePath!).existsSync()
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.file(
+                              File(product.imagePath!),
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Container(
                             width: 60,
                             height: 60,
-                            fit: BoxFit.cover,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.image_not_supported,
+                                color: Colors.grey),
                           ),
-                        )
-                      : Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.image_not_supported,
-                              color: Colors.grey),
+                    title: Text(
+                      product.name,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // const SizedBox(height: 2),
+                        Text(
+                          'Qty: ${product.quantity}', // Display product quantity
+                          style: const TextStyle(fontWeight: FontWeight.w400),
                         ),
-                  title: Text(
-                    product.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                        // const SizedBox(height: 4),
+                        Text(
+                          'Price: \₹${product.price.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w400, color: Colors.green),
+                        ),
+                      ],
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ProductDetailsPage(product: product),
+                        ),
+                      );
+                    },
+                    onLongPress: () {
+                      _showDeleteConfirmationDialog(context, product);
+                    },
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Text(
-                        'Quantity: ${product.quantity}', // Display product quantity
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Price: \$${product.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.green),
-                      ),
-                    ],
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ProductDetailsPage(product: product),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ],
     );
+      },
+    );
+   
   }
+
+void _showDeleteConfirmationDialog(BuildContext context, ProductModel product) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Delete Product'),
+        content: Text('Are you sure you want to delete "${product.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              deleteProduct(product);
+            },
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -455,7 +492,6 @@ class _InventoryState extends State<Inventory> {
                                     builder: (context) => BrandListingPage()),
                               ),
                             ),
-
                             _buildBrandsGrid()
                           ],
                         ),
@@ -470,7 +506,7 @@ class _InventoryState extends State<Inventory> {
             child: Column(
               children: [
                 const SizedBox(
-                  height: 25,
+                  height: 15,
                 ),
                 Expanded(child: _buildProductsList())
               ],
@@ -480,7 +516,7 @@ class _InventoryState extends State<Inventory> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showBottomSheet(context),
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add,color: Colors.white,),
         backgroundColor: const Color(0xFF17A2B8),
       ),
     );
