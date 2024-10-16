@@ -64,21 +64,32 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return  Scaffold(
       backgroundColor: Colors.white, 
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Container(
+              height: 150,
+              width: 250,
+  decoration: BoxDecoration(
+    image: DecorationImage(
+      image: AssetImage('assets/app_logo/pixelcut-export.png'), // Your image asset
+      fit: BoxFit.cover, // Adjust this based on how you want the image to fit
+    ),
+  ),
+),
+
          
-            SizedBox(height: 20),
-            Text(
-              'inventivo',
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
-            ),
+            // SizedBox(height: 20),
+            // Text(
+            //   'inventivo',
+            //   style: TextStyle(
+            //       fontSize: 24,
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.black),
+            // ),
           ],
         ),
       ),

@@ -89,149 +89,288 @@ class _InventoryState extends State<Inventory> {
     );
   }
 
-  Widget _buildCategoriesGrid() {
-    List<Widget> gridItems = [];
-
-    if (_categories.isEmpty) {
-      gridItems.add(
-        const Center(
-          child: Padding(
-            padding: EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.category,
-                  size: 50,
-                  color: Colors.grey,
-                ),
-                Text(
-                  'No categories available',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
+Widget _buildCategoriesGrid() {
+  if (_categories.isEmpty) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.category_outlined,
+            size: 70,
+            color: Colors.grey[300],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No categories yet',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
             ),
           ),
-        ),
-      );
-    } else {
-      gridItems = _categories.map((category) {
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CategoryProductListPage(
-                  categoryName: category.name,
+          const SizedBox(height: 8),
+          Text(
+            'Add some categories to get started',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  return Container(
+    height: 140,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: _categories.length,
+      itemBuilder: (context, index) {
+        final category = _categories[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryProductListPage(
+                    categoryName: category.name,
+                  ),
                 ),
-              ),
-            );
-          },
-          child: Card(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
+              );
+            },
             child: Container(
-              width: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  category.imagePath != null
-                      ? Image.file(
+              width: 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF6A11CB),
+                    Color(0xFF2575FC),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
+                  children: [
+                    if (category.imagePath != null)
+                      Positioned.fill(
+                        child: Image.file(
                           File(category.imagePath!),
-                          height: 50,
-                          width: 50,
                           fit: BoxFit.cover,
-                        )
-                      : const Icon(Icons.category),
-                  const SizedBox(height: 8),
-                  Text(category.name),
-                ],
+                        ),
+                      ),
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.7),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 12,
+                      left: 12,
+                      right: 12,
+                      child: Text(
+                        category.name,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              offset: Offset(1, 1),
+                              blurRadius: 3,
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    if (category.imagePath == null)
+                      Center(
+                        child: Icon(
+                          Icons.category,
+                          size: 40,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
         );
-      }).toList();
-    }
-
-    return Container(
-      height: 100,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: gridItems,
+      },
+    ),
+  );
+}
+  
+Widget _buildBrandsGrid() {
+  if (_brands.isEmpty) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.branding_watermark_outlined,
+            size: 70,
+            color: Colors.grey[300],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No brands yet',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Add some brands to get started',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildBrandsGrid() {
-    List<Widget> gridItems = [];
-
-    if (_brands.isEmpty) {
-      gridItems.add(
-        const Center(
-          child: Padding(
-            padding: EdgeInsets.all(9.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.branding_watermark,
-                  size: 50,
-                  color: Colors.grey,
+  return Container(
+    height: 140,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: _brands.length,
+      itemBuilder: (context, index) {
+        final brand = _brands[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BrandProductListPage(
+                    brandName: brand.name,
+                  ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'No brands available.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      gridItems = _brands.map((brand) {
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BrandProductListPage(
-                  brandName: brand.name,
-                ),
-              ),
-            );
-          },
-          child: Card(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
+              );
+            },
             child: Container(
-              width: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  brand.imagePath != null && File(brand.imagePath!).existsSync()
-                      ? Image.file(
-                          File(brand.imagePath!),
-                          height: 50,
-                          width: 50,
-                          fit: BoxFit.cover,
-                        )
-                      : const Icon(Icons.branding_watermark),
-                  const SizedBox(height: 8),
-                  Text(brand.name),
+              width: 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF1E3C72),
+                    Color(0xFF2A5298),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
                 ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
+                  children: [
+                    if (brand.imagePath != null && File(brand.imagePath!).existsSync())
+                      Positioned.fill(
+                        child: Image.file(
+                          File(brand.imagePath!),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.7),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 12,
+                      left: 12,
+                      right: 12,
+                      child: Text(
+                        brand.name,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              offset: Offset(1, 1),
+                              blurRadius: 3,
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    if (brand.imagePath == null || !File(brand.imagePath!).existsSync())
+                      Center(
+                        child: Icon(
+                          Icons.branding_watermark,
+                          size: 40,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
         );
-      }).toList();
-    }
-
-    return Container(
-      height: 100,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: gridItems,
-      ),
-    );
-  }
+      },
+    ),
+  );
+}
+ 
 
   Widget _buildProductsList() {
     return ValueListenableBuilder<List<ProductModel>>(
@@ -389,11 +528,11 @@ void _showDeleteConfirmationDialog(BuildContext context, ProductModel product) {
                 bottomLeft: Radius.circular(60),
               ),
             ),
-            expandedHeight: 480,
+            expandedHeight: 520,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: const Padding(
-                padding: EdgeInsets.all(5.0),
+                padding: EdgeInsets.only(top: 5.0),
                 child: Text(
                   'Inventivo',
                   style: TextStyle(
@@ -483,7 +622,7 @@ void _showDeleteConfirmationDialog(BuildContext context, ProductModel product) {
                             ),
                             // const SizedBox(height: 10),
                             _buildCategoriesGrid(),
-                            const SizedBox(height: 10),
+                            // const SizedBox(height: 2),
                             _buildSectionHeader(
                               'Brands',
                               () => Navigator.push(
@@ -506,7 +645,7 @@ void _showDeleteConfirmationDialog(BuildContext context, ProductModel product) {
             child: Column(
               children: [
                 const SizedBox(
-                  height: 15,
+                  height: 13,
                 ),
                 Expanded(child: _buildProductsList())
               ],

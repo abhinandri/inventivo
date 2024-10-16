@@ -66,6 +66,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:project/model_classes/brandmodel.dart';
 import 'package:project/db_function/brand_function.dart';
+import 'package:project/pages/color.dart';
 import 'package:project/pages/inventory_page/brand_item_list.dart';
 
 class BrandListingPage extends StatefulWidget {
@@ -93,7 +94,9 @@ class _BrandListingPageState extends State<BrandListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('All Brands'),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor:CustomeColors.Primary,
+        title: Text('All Brands',style: TextStyle(color: Colors.white),),
         centerTitle: true,
       ),
       body:_brands.isEmpty? Center(

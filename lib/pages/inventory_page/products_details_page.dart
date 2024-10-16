@@ -279,17 +279,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               color: Colors.green,
             ),
           ),
-          // Container(
-          //   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          //   decoration: BoxDecoration(
-          //     color: CustomeColors.Primary,
-          //     borderRadius: BorderRadius.circular(20),
-          //   ),
-          //   child: Text(
-          //     'In Stock',
-          //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          //   ),
-          // ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'In Stock',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:project/db_function/catagory_function.dart';
 import 'package:project/model_classes/usermodel.dart';
+import 'package:project/pages/color.dart';
 import 'package:project/pages/inventory_page/category_itemsList.dart';
 
 class CategoryListingPage extends StatefulWidget {
@@ -30,7 +31,9 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('All Categories'),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: CustomeColors.Primary,
+        title: Text('All Categories',style: TextStyle(color: Colors.white),),
         centerTitle: true,
       ),
       body:_categories.isEmpty? Center(

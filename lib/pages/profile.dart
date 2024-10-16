@@ -26,7 +26,7 @@ class _ProfileState extends State<Profile> {
   final List<String> _title = [
     'Settings',
     'Privacy Policy',
-    'Terms Of Use',
+    'Terms and condition',
     'Logout',
   ];
 
@@ -67,7 +67,7 @@ class _ProfileState extends State<Profile> {
       case 'Privacy Policy':
         Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicy()));
         break;
-      case 'Terms Of Use':
+      case 'Terms and condition':
         Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsConditions()));
         break;
       case 'Logout':
