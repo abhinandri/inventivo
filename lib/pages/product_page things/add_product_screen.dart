@@ -8,6 +8,8 @@ import 'package:project/model_classes/brandmodel.dart';
 import 'package:project/model_classes/productModel.dart';
 import 'package:project/model_classes/usermodel.dart';
 import 'package:project/pages/color.dart';
+import 'package:project/pages/easy_use.dart';
+import 'package:project/pages/product_page%20things/add_product_text.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({Key? key}) : super(key: key);
@@ -120,22 +122,22 @@ class _AddProductScreenState extends State<AddProductScreen> {
               children: [
                 _buildImagePicker(),
                 const SizedBox(height: 24),
-                _buildTextFormField(
+                buildTextFormField(
                     _nameController, 'Product Name', Icons.shopping_bag),
-                _buildTextFormField(_priceController, 'Price',
+                buildTextFormField(_priceController, 'Price',
                     Icons.attach_money, TextInputType.number),
-                _buildTextFormField(_quantityController, 'Quantity',
+                buildTextFormField(_quantityController, 'Quantity',
                     Icons.inventory, TextInputType.number),
-                _buildTextFormField(
+                buildTextFormField(
                     _colorController, 'Color', Icons.color_lens),
-                _buildTextFormField(_descriptionController, 'Description',Icons.description_sharp,TextInputType.multiline,3),
-                _buildDropdownField(
+                buildTextFormField(_descriptionController, 'Description',Icons.description_sharp,TextInputType.multiline,),
+                buildDropdownField(
                     'Category',
                     _categories.map((c) => c.name).toList(),
                     _selectedCategory,
                     (value) => setState(() => _selectedCategory = value),
                     Icons.category),
-                _buildDropdownField(
+                buildDropdownField(
                     'Brand',
                     _brands.map((b) => b.name).toList(),
                     _selectedBrand,
@@ -193,54 +195,5 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  Widget _buildTextFormField(
-      TextEditingController controller, String label, IconData icon,
-      [TextInputType keyboardType = TextInputType.text,int maxLines=1]) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          filled: true,
-          fillColor: Colors.grey[100],
-        ),
-        keyboardType: keyboardType,
-      
-        maxLines: maxLines,
-        validator: (value) =>
-            value?.isEmpty ?? true ? 'Please enter $label' : null,
-      ),
-    );
-  }
-
-  Widget _buildDropdownField(String label, List<String> items, String? value,
-      void Function(String?) onChanged, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: DropdownButtonFormField<String>(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        value: value,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          filled: true,
-          fillColor: Colors.grey[100],
-        ),
-        items: items
-            .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-            .toList(),
-        onChanged: onChanged,
-        validator: (value) => value == null ? 'Please select a $label' : null,
-      ),
-    );
-  }
+ 
 }

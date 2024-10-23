@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
         
     final userBox = await Hive.openBox<UserModel>('user_db');
-    final user = userBox.isNotEmpty ? userBox.getAt(0) as UserModel? : null;
+    final user = userBox.isNotEmpty ? userBox.getAt(0) : null;
 
 
         // Log user details for debugging
@@ -79,17 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
       fit: BoxFit.cover, // Adjust this based on how you want the image to fit
     ),
   ),
-),
-
-         
-            // SizedBox(height: 20),
-            // Text(
-            //   'inventivo',
-            //   style: TextStyle(
-            //       fontSize: 24,
-            //       fontWeight: FontWeight.bold,
-            //       color: Colors.black),
-            // ),
+)
           ],
         ),
       ),

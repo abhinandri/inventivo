@@ -88,12 +88,12 @@ class _EditProductPageState extends State<EditProductPage> {
         backgroundColor: CustomeColors.Primary,
         title: const Text('Edit Product',style: TextStyle(color: Colors.white),),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveChanges,
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.save),
+        //     onPressed: _saveChanges,
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -119,15 +119,17 @@ class _EditProductPageState extends State<EditProductPage> {
                 // Add dropdown fields for category and brand here
                 SizedBox(height: 24),
                 ElevatedButton(
+                  
                   onPressed: _saveChanges,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: CustomeColors.Primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: const Text('Save Changes',
-                      style: TextStyle(fontSize: 18)),
+                      style: TextStyle(fontSize: 18,color: Colors.white)),
                 ),
               ],
             ),

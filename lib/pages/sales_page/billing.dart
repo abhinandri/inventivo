@@ -1,163 +1,9 @@
-
-// import 'package:flutter/material.dart';
-// import 'package:hive/hive.dart';
-// import 'package:intl/intl.dart';
-// import 'package:project/model_classes/sales_model.dart';
-// import 'package:project/pages/sales_page/biling_details.dart';
-// import 'package:project/pages/sales_page/sales_add_page.dart';
-
-// class SalesPage extends StatefulWidget {
-//   @override
-//   _SalesPageState createState() => _SalesPageState();
-// }
-
-// class _SalesPageState extends State<SalesPage> {
-//   List<SalesModel> _sales = [];
-//   List<SalesModel> _allSales = []; // Store all sales for filtering
-//   DateTime? _startDate;
-//   DateTime? _endDate;
-  
-//   @override
-//   void initState() {
-//     super.initState();
-//     _fetchSales(); // Fetch sales data when the page is initialized
-//   }
-//   Future<void> _fetchSales() async {
-//     final salesBox = await Hive.openBox<SalesModel>('salesBox');
-//     setState(() {
-//       _allSales = salesBox.values.toList(); // Store all sales
-//       _sales = List.from(_allSales); // Initialize filtered sales
-//       _sales.sort((a, b) => b.date.compareTo(a.date)); // Sort by date, newest first
-//     });
-//     _filterSalesByDateRange(); // Apply filtering immediately based on current dates
-//   }
-//   Future<void> _selectDate(BuildContext context) async {
-//     final DateTimeRange? picked = await showDateRangePicker(
-//       context: context,
-//       firstDate: DateTime(2000),
-//       lastDate: DateTime.now(),
-//       initialDateRange: _startDate != null && _endDate != null  
-//           ? DateTimeRange(start: _startDate!, end: _endDate!)
-//           : DateTimeRange(
-//               start: DateTime.now(),
-//               end: DateTime.now(),
-//             ),
-//     );
-//       // Debugging print to check if picker is being called
-//   print('Picked date range: ${picked?.start} to ${picked?.end}'); 
-
-//     if (picked != null) {
-//       setState(() {
-//         _startDate = picked.start;
-//         _endDate = picked.end;
-//       });
-//       _filterSalesByDateRange(); // Filter sales immediately after date selection
-//     }
-//   }
-//   void _filterSalesByDateRange() {
-//     if (_startDate == null || _endDate == null) {
-//       _sales = List.from(_allSales); // Reset to all sales if no date range is set
-//     } else {
-//           final DateFormat dateFormat = DateFormat('dd-MM-yyyy'); // Define your date format
-//       setState(() {
-//         _sales = _allSales.where((sale) {
-//           DateTime saleDate = dateFormat.parse(sale.date);
-//           return saleDate.isAfter(_startDate!.subtract(Duration(days: 1))) && // Include start date
-//               saleDate.isBefore(_endDate!.add(Duration(days: 1))); // Include end date
-//         }).toList();
-//       });
-//     }
-//   }
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         automaticallyImplyLeading: false,
-//         title: const Text('Sales',style: TextStyle(color:Colors.white),),
-//         centerTitle: true,
-//         backgroundColor: Color(0xFF17A2B8),
-//         actions: [
-//           IconButton(
-//             icon: const Icon(Icons.calendar_today,color: Colors.white,),
-//             onPressed: () => _selectDate(context),
-//           ),
-//         ],
-//       ),
-//       body: _sales.isEmpty
-//           ? Center(
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Icon(Icons.shopping_cart, size: 80, color: Colors.grey[400]),
-//                   SizedBox(height: 16),
-//                   Text(
-//                     'No recent sales',
-//                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                   ),
-//                   SizedBox(height: 8),
-//                   Text(
-//                     'Tap the button to add a new sale',
-//                     style: TextStyle(color: Colors.grey[600]),
-//                   ),
-//                 ],
-//               ),
-//             )
-//           : ListView.separated(
-//               itemCount: _sales.length,
-//               separatorBuilder: (context, index) => Divider(),
-//               itemBuilder: (context, index) {
-//                 final sale = _sales[index];
-//                 return ListTile(
-//                   leading: CircleAvatar(
-//                     backgroundColor: Color(0xFF17A2B8),
-//                     child: Text(
-//                       sale.customerName[0].toUpperCase(),
-//                       style: TextStyle(color: Colors.white),
-//                     ),
-//                   ),
-//                   title: Text(sale.customerName,
-//                       style: TextStyle(fontWeight: FontWeight.bold)),
-//                   subtitle: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text('Number: ${sale.customerNumber}'),
-//                       Text('Date: ${sale.date.toString().substring(0, 10)}'),
-//                     ],
-//                   ),
-//                   trailing: Icon(Icons.chevron_right),
-//                   onTap: () {
-//                     Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                         builder: (context) => SaleDetailsPage(sale: sale),
-//                       ),
-//                     );
-//                   },
-//                 );
-//               },
-//             ),
-//       floatingActionButton: FloatingActionButton.extended(
-//         onPressed: () {
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(builder: (context) => AddSaleScreen()),
-//           ).then((_) {
-//             _fetchSales(); // Fetch sales data after returning from AddSaleScreen
-//           });
-//         },
-//         icon: Icon(Icons.add,color: Colors.white,),
-//         label: Text('Add Sale',style: TextStyle(color: Colors.white),),
-//         backgroundColor: Color(0xFF17A2B8),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:project/model_classes/sales_model.dart';
 import 'package:project/pages/sales_page/biling_details.dart';
-import 'package:project/pages/sales_page/sales_add_page.dart';
+import 'package:project/pages/sales_page/sales_add/sales_add_page.dart';
 
 class SalesPage extends StatefulWidget {
   @override
@@ -165,55 +11,58 @@ class SalesPage extends StatefulWidget {
 }
 
 class _SalesPageState extends State<SalesPage> {
-  List<SalesModel> _sales = [];
-  List<SalesModel> _allSales = [];
-  DateTimeRange? _selectedDateRange;
+  List<SalesModel> _sales = [];         // List of filtered sales
+  List<SalesModel> _allSales = [];      // Complete list of sales
+  DateTimeRange? _selectedDateRange;    // Date range selected by the user
   
   @override
   void initState() {
     super.initState();
-    _fetchSales();
+    _fetchSales();  // Fetch sales data when the page is initialized
   }
 
+  // Fetch sales data from Hive database and filter by date range
   Future<void> _fetchSales() async {
     final salesBox = await Hive.openBox<SalesModel>('salesBox');
     setState(() {
       _allSales = salesBox.values.toList();
-      _sales = List.from(_allSales);
-      _sales.sort((a, b) => b.date.compareTo(a.date));
+      _sales = List.from(_allSales);  // Copy the entire list to _sales
+      _sales.sort((a, b) => b.date.compareTo(a.date));  // Sort sales by date in descending order
     });
-    _filterSalesByDateRange();
+    _filterSalesByDateRange();  // Filter sales based on selected date range
   }
 
+  // Show the date range picker to allow user to select a date range
   Future<void> _selectDate(BuildContext context) async {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      firstDate: DateTime(2000),  // Start date for the picker
+      lastDate: DateTime.now(),   // End date for the picker
       initialDateRange: _selectedDateRange ?? DateTimeRange(
-        start: DateTime.now().subtract(Duration(days: 7)),
-        end: DateTime.now(),
+        start: DateTime.now().subtract(Duration(days: 7)),  // Default start date is 7 days ago
+        end: DateTime.now(),                                // Default end date is today
       ),
     );
 
     if (picked != null && picked != _selectedDateRange) {
       setState(() {
-        _selectedDateRange = picked;
+        _selectedDateRange = picked;  // Update the selected date range
       });
-      _filterSalesByDateRange();
+      _filterSalesByDateRange();  // Filter the sales based on the new date range
     }
   }
 
+  // Filter sales based on the selected date range
   void _filterSalesByDateRange() {
     if (_selectedDateRange == null) {
-      _sales = List.from(_allSales);
+      _sales = List.from(_allSales);  // No date range selected, show all sales
     } else {
-      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');  // Date format for parsing
       setState(() {
         _sales = _allSales.where((sale) {
           DateTime saleDate = dateFormat.parse(sale.date);
           return saleDate.isAfter(_selectedDateRange!.start.subtract(Duration(days: 1))) &&
-              saleDate.isBefore(_selectedDateRange!.end.add(Duration(days: 1)));
+                 saleDate.isBefore(_selectedDateRange!.end.add(Duration(days: 1)));  // Filter sales within the selected range
         }).toList();
       });
     }
@@ -223,56 +72,50 @@ class _SalesPageState extends State<SalesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false,  // Disable back button
         title: const Text('Sales', style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: Color(0xFF17A2B8),
+        centerTitle: true,                 // Center the title
+        backgroundColor: Color(0xFF17A2B8),  // Set the app bar color
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today, color: Colors.white),
-            onPressed: () => _selectDate(context),
+            onPressed: () => _selectDate(context),  // Open date picker when the calendar icon is pressed
           ),
         ],
       ),
       body: Column(
         children: [
+          // Display selected date range or 'No date range selected' message
           Padding(
-  padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
-  child: Row(
-    children: [
-      Icon(Icons.date_range, color: Color(0xFF17A2B8)),
-      SizedBox(width: 8), // Add some spacing between icon and text
-      Expanded(
-        child: Text(
-          _selectedDateRange == null
-              ? 'No date range selected'
-              : 'Selected Range: ${DateFormat('MMM d').format(_selectedDateRange!.start)} - ${DateFormat('MMM d, yyyy').format(_selectedDateRange!.end)}',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[700], // Darker shade for better readability
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+            child: Row(
+              children: [
+                Icon(Icons.date_range, color: Color(0xFF17A2B8)),
+                SizedBox(width: 8),  // Add some spacing between icon and text
+                Expanded(
+                  child: Text(
+                    _selectedDateRange == null
+                        ? 'No date range selected'  // If no date range is selected
+                        : 'Selected Range: ${DateFormat('MMM d').format(_selectedDateRange!.start)} - ${DateFormat('MMM d, yyyy').format(_selectedDateRange!.end)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[700],  // Darker shade for better readability
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
-    ],
-  ),
-),
-          // Padding(
-          //   padding: const EdgeInsets.only(left: 0,right: 90),
-          //   child: Text(
-          //     _selectedDateRange == null
-          //         ? 'No date range selected'
-          //         : 'Selected Range: ${DateFormat('MMM d').format(_selectedDateRange!.start)} - ${DateFormat('MMM d, yyyy').format(_selectedDateRange!.end)}',
-          //     style: TextStyle(fontSize: 16, color: Colors.grey[500]),
-          //   ),
-          // ),
+          
+          // Display the list of sales or an empty state if no sales exist
           Expanded(
             child: _sales.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.shopping_cart, size: 80, color: Colors.grey[400]),
+                      Icon(Icons.shopping_cart, size: 80, color: Colors.grey[400]),  // Display an icon when no sales are available
                       SizedBox(height: 16),
                       Text(
                         'No sales in selected date range',
@@ -287,29 +130,30 @@ class _SalesPageState extends State<SalesPage> {
                   ),
                 )
               : ListView.separated(
-                  itemCount: _sales.length,
-                  separatorBuilder: (context, index) => Divider(),
+                  itemCount: _sales.length,  // Total number of sales to display
+                  separatorBuilder: (context, index) => Divider(),  // Divider between list items
                   itemBuilder: (context, index) {
                     final sale = _sales[index];
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundColor: Color(0xFF17A2B8),
                         child: Text(
-                          sale.customerName[0].toUpperCase(),
+                          sale.customerName[0].toUpperCase(),  // First letter of customer name
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
                       title: Text(sale.customerName,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontWeight: FontWeight.bold)),  // Display customer name
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Number: ${sale.customerNumber}'),
-                          Text('Date: ${sale.date}'),
+                          Text('Number: ${sale.customerNumber}'),  // Display customer number
+                          Text('Date: ${sale.date}'),              // Display sale date
                         ],
                       ),
-                      trailing: Icon(Icons.chevron_right),
+                      trailing: Icon(Icons.chevron_right),  // Right arrow icon for navigation
                       onTap: () {
+                        // Navigate to the sale details page when tapped
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -323,18 +167,20 @@ class _SalesPageState extends State<SalesPage> {
           ),
         ],
       ),
+      
+      // Floating action button to add a new sale
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddSaleScreen()),
+            MaterialPageRoute(builder: (context) => AddSaleScreen()),  // Navigate to add sale screen
           ).then((_) {
-            _fetchSales();
+            _fetchSales();  // Refresh sales after adding a new one
           });
         },
-        icon: Icon(Icons.add, color: Colors.white),
-        label: Text('Add Sale', style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF17A2B8),
+        icon: Icon(Icons.add, color: Colors.white),  // Plus icon for the button
+        label: Text('Add Sale', style: TextStyle(color: Colors.white)),  // Button label
+        backgroundColor: Color(0xFF17A2B8),  // Button color
       ),
     );
   }

@@ -7,7 +7,13 @@ import 'package:project/db_function/sales_function.dart';
 import 'package:project/model_classes/productModel.dart';
 import 'package:project/model_classes/sales_model.dart';
 import 'package:project/model_classes/usermodel.dart';
-import 'package:project/pages/color.dart'; // Import the sales model
+import 'package:project/pages/color.dart';
+import 'package:project/pages/easy_use.dart';
+import 'package:project/pages/sales_page/sales_add/add_sale_container.dart';
+import 'package:project/pages/sales_page/sales_add/add_sale_list.dart';
+import 'package:project/pages/sales_page/sales_add/custom_elevated_button.dart';
+import 'package:project/pages/sales_page/sales_add/product_selection.dart';
+import 'package:project/pages/sales_page/sales_add/sales_submit_button.dart'; // Import the sales model
 
 class AddSaleScreen extends StatefulWidget {
   const AddSaleScreen({Key? key}) : super(key: key);
@@ -25,9 +31,9 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
   final _customernumberController = TextEditingController();
 
   ProductModel? _selectedProduct;
-  List<ProductModel> _products = [];
-  List<CategoryModel> _categories = [];
-  String? _selectedCategory;
+  List<ProductModel> products = [];
+  List<CategoryModel> categories = [];
+  String? selectedCategory;
   String _searchQuery = '';
   List<SelectedProduct> _selectedProducts = [];
 
@@ -37,7 +43,7 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
     _fetchProducts();
     _fetchCategories();
     // _dateController.text = DateTime.now().toString().split(' ')[0];
-     _dateController.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    _dateController.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
   }
 
   @override
@@ -54,7 +60,7 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
     final fetchedProducts = await getAllProducts();
     if (fetchedProducts != null) {
       setState(() {
-        _products = fetchedProducts;
+        products = fetchedProducts;
       });
     }
   }
@@ -63,108 +69,91 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
     final fetchedCategories = await getAllCatogories();
     if (fetchedCategories != null) {
       setState(() {
-        _categories = fetchedCategories;
+        categories = fetchedCategories;
       });
     }
   }
 
+  void showProductSelectionBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select Product',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              const SizedBox(height: 16),
+              _buildSearchField(),
+              const SizedBox(height: 16),
+              Expanded(
+                child: _buildProductList(),
+              ),
+            ],
+          ),
+        );
+      },
+    ).then((selectedProduct) {
+      if (selectedProduct != null) {
+        setState(() {
+          _selectedProduct = selectedProduct;
+          _quantityController.text = '1'; // Default quantity
+          _priceController.text =
+              selectedProduct.price.toStringAsFixed(2); // Default price
+        });
+      }
+    });
+  }
 
-void _showProductSelectionBottomSheet() {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (BuildContext context) {
-      return Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select Product',
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            const SizedBox(height: 16),
-            _buildSearchField(),
-            const SizedBox(height: 16),
-            Expanded(
-              child: _buildProductList(),
-            ),
-          ],
+  Widget _buildSearchField() {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: 'Search Products',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            setState(() {
+              _searchQuery = ''; // Clear the search query
+            });
+          },
         ),
-      );
-    },
-  ).then((selectedProduct) {
-    if (selectedProduct != null) {
-      setState(() {
-        _selectedProduct = selectedProduct;
-        _quantityController.text = '1'; // Default quantity
-        _priceController.text =
-            selectedProduct.price.toStringAsFixed(2); // Default price
-      });
-    }
-  });
-}
-
-Widget _buildSearchField() {
-  return TextField(
-    decoration: InputDecoration(
-      labelText: 'Search Products',
-      prefixIcon: const Icon(Icons.search),
-      suffixIcon: IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () {
-          setState(() {
-            _searchQuery = ''; // Clear the search query
-          });
-        },
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-    ),
-    onChanged: (value) {
-      // You can implement a debounce function here if needed
-      setState(() {
-        _searchQuery = value;
-      });
-    },
-  );
-}
-
-Widget _buildProductList() {
-  List<ProductModel> filteredProducts = _products.where((product) {
-    return product.name.toLowerCase().contains(_searchQuery.toLowerCase());
-  }).toList();
-
-  // If no products are found, show a message
-  if (filteredProducts.isEmpty) {
-    return Center(
-      child: Text(
-        'No products found',
-        style: TextStyle(color: Colors.grey),
-      ),
+      onChanged: (value) {
+        // You can implement a debounce function here if needed
+        setState(() {
+          _searchQuery = value;
+        });
+      },
     );
   }
 
-  return ListView.builder(
-    itemCount: filteredProducts.length,
-    itemBuilder: (context, index) {
-      final product = filteredProducts[index];
-      return Card( // Added Card for better styling
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        child: ListTile(
-          title: Text(product.name),
-          subtitle: Text('Price: \₹${product.price.toStringAsFixed(2)}'),
-          onTap: () {
-            Navigator.of(context).pop(product);
-          },
+  Widget _buildProductList() {
+    List<ProductModel> filteredProducts = products.where((product) {
+      return product.name.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
+
+    // If no products are found, show a message
+    if (filteredProducts.isEmpty) {
+      return Center(
+        child: Text(
+          'No products found',
+          style: TextStyle(color: Colors.grey),
         ),
       );
-    },
-  );
-}
+    }
 
+    return addSaleList(filteredProducts: filteredProducts);
+  }
 
   Future<void> _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
@@ -176,12 +165,12 @@ Widget _buildProductList() {
     if (pickedDate != null) {
       setState(() {
         // _dateController.text = pickedDate.toLocal().toString().split(' ')[0];
-          _dateController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
+        _dateController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
       });
     }
   }
 
-  void _addProduct() {
+  void addProduct() {
     if (_selectedProduct != null) {
       //check if product is in stock
       if (_selectedProduct!.quantity > 0) {
@@ -203,7 +192,7 @@ Widget _buildProductList() {
     }
   }
 
-  void _submitSale() async {
+  void submitSale() async {
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedProducts.isEmpty) {
         _showSnackBar('Please add at least one product');
@@ -315,19 +304,7 @@ Widget _buildProductList() {
                 });
                 _showSnackBar('Product removed');
               },
-              background: Container(
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Icon(Icons.delete, color: Colors.white),
-                  ),
-                ),
-              ),
+              background: add_sale_container(),
               child: Card(
                 elevation: 2,
                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -463,11 +440,9 @@ Widget _buildProductList() {
             ElevatedButton(
               onPressed: () {
                 final int? quantity = int.tryParse(_quantityController.text);
-                if (quantity != null && quantity > 0) {
-                  Navigator.of(context).pop(quantity);
-                } else {
-                  Navigator.of(context).pop();
-                }
+                (quantity != null && quantity > 0)
+                    ? Navigator.of(context).pop(quantity)
+                    : Navigator.of(context).pop();
               },
               child: Text('OK'),
               style: ElevatedButton.styleFrom(
@@ -482,36 +457,60 @@ Widget _buildProductList() {
     );
   }
 
-  Widget _buildTextFormField(
-      TextEditingController controller, String label, IconData icon,
-      [TextInputType keyboardType = TextInputType.text, VoidCallback? onTap]) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: CustomeColors.Primary,
+        title: const Text('Add Sale', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              buildTextFormField(_dateController, 'Date', Icons.calendar_today,
+                  TextInputType.datetime, _selectDate),
+              buildTextFormField(
+                  _customernameController, 'Customer Name', Icons.person),
+              buildTextFormField(_customernumberController, 'Mobile Number',
+                  Icons.phone, TextInputType.number),
+              SizedBox(
+                height: 40,
+              ),
+              buildProductSelection(),
+              // ProductSelection(selectedProduct: _selectedProduct),
+              buildTextFormField(_quantityController, 'Quantity',
+                  Icons.confirmation_number, TextInputType.number),
+              buildTextFormField(_priceController, 'Price', Icons.attach_money,
+                  TextInputType.number),
+              const SizedBox(height: 16),
+              CustomButton(
+                addProduct: addProduct,
+              ),
+              SizedBox(height: 16),
+              _buildSelectedProductsList(),
+              const SizedBox(height: 24),
+              SubmitButton(
+                function: submitSale,
+              ),
+            ],
           ),
-          filled: true,
-          fillColor: Colors.grey[100],
         ),
-        keyboardType: keyboardType,
-        onTap: onTap,
-        readOnly: onTap != null,
-        validator: (value) =>
-            value?.isEmpty ?? true ? 'Please enter $label' : null,
       ),
     );
   }
 
-  Widget _buildProductSelection() {
+  Widget buildProductSelection() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: InkWell(
-        onTap: _showProductSelectionBottomSheet,
+        onTap: showProductSelectionBottomSheet,
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: 'Select Product',
@@ -530,90 +529,6 @@ Widget _buildProductList() {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: CustomeColors.Primary,
-        title: const Text('Add Sale',style: TextStyle(color: Colors.white),),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildTextFormField(
-                _dateController,
-                'Date',
-                Icons.calendar_today,
-                TextInputType.datetime,
-                _selectDate,
-              ),
-              _buildTextFormField(
-                  _customernameController, 'Customer Name', Icons.person,),
-              _buildTextFormField(_customernumberController, 'Mobile Number',
-                  Icons.phone, TextInputType.number),
-                  SizedBox(height: 40,),
-              _buildProductSelection(),
-              _buildTextFormField(
-                _quantityController,
-                'Quantity',
-                Icons.confirmation_number,
-                TextInputType.number,
-              ),
-              _buildTextFormField(
-                _priceController,
-                'Price',
-                Icons.attach_money,
-                TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _addProduct,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomeColors.Primary,
-                  
-                  padding: EdgeInsets.symmetric(horizontal: 18,vertical: 12)
-                ),
-                child: const Text('Add Product',style: TextStyle(
-
-                   fontSize: 16, // Text size
-      fontWeight: FontWeight.w500, // Semi-bold text
-      color: Colors.white, // Text color
-    
-                ),),
-              ),
-              const SizedBox(height: 16),
-              _buildSelectedProductsList(),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                
-                onPressed: _submitSale,
-                style: ElevatedButton.styleFrom(
-                  
-                  backgroundColor: CustomeColors.Primary,
-                  // foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 36,vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-
-                  ),
-                  
-                ),
-                
-                child: Text('Save Sale', style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: Colors.white)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class SelectedProduct {
